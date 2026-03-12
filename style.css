@@ -509,7 +509,7 @@ body {
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, z-index 0s 0.25s;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, visibility 0.5s ease, z-index 0s 0.25s;
     display: flex;
     flex-direction: column;
     opacity: 0;
@@ -825,7 +825,8 @@ body {
     }
 
     .product-card.next-2 {
-        display: none;
+        opacity: 0;
+        visibility: hidden;
     }
 
     .product-card.prev-1 {
@@ -839,7 +840,8 @@ body {
     }
 
     .product-card.next-1, .product-card.prev-1 {
-        display: none;
+        opacity: 0;
+        visibility: hidden;
     }
     
     .slider-controls {
