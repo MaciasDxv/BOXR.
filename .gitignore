@@ -1,0 +1,13 @@
+# OS metadata
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+
+# Project specifics
+*.log
+node_modules/
+dist/

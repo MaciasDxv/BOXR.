@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOXR. | Ropa Interior Masculina</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            BOX<span>R.</span>
+        </div>
+        <div class="nav-icons">
+            <div class="cart-icon">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge">0</span>
+            </div>
+            <div class="menu-icon" id="menu-toggle">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Tu Carrito</h3>
+            <button class="cart-close" id="cart-close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Dynamically populated -->
+        </div>
+        <div class="cart-empty" id="cart-empty">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <p>Tu carrito está vacío</p>
+        </div>
+        <div class="cart-footer" id="cart-footer">
+            <div class="cart-totals">
+                <div class="cart-total-row">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">$0.00</span>
+                </div>
+                <div class="cart-total-row cart-total-final">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+            </div>
+            <button class="btn-checkout" id="btn-checkout">Proceder al Pago</button>
+        </div>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <ul>
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#shop">Colección</a></li>
+            <li><a href="#">Nosotros</a></li>
+            <li><a href="#">Contacto</a></li>
+        </ul>
+    </div>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Redefine tu <br><span>Comodidad</span></h1>
+            <p>Ropa interior premium para el hombre moderno. Elegancia, soporte y el mejor ajuste.</p>
+            <a href="#shop" class="btn-primary">Explorar Colección</a>
+        </div>
+    </header>
+
+    <section id="shop" class="featured relative-section">
+        <h2>Novedades</h2>
+        <div class="carousel-wrapper" style="position: relative; max-width: 1000px; margin: 0 auto;">
+            <div class="slider-container" id="product-slider">
+                <div class="product-card active">
+                    <div class="product-img placeholder-img"></div>
+                    <div class="product-info">
+                        <h3>White Classic</h3>
+                        <p class="price">$250.00</p>
+                        <button class="btn-secondary add-to-cart">Añadir al Carrito</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img placeholder-img"></div>
+                    <div class="product-info">
+                        <h3>Gris Cuarzo</h3>
+                        <p class="price">$220.00</p>
+                        <button class="btn-secondary add-to-cart">Añadir al Carrito</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img placeholder-img"></div>
+                    <div class="product-info">
+                        <h3>Manta Black</h3>
+                        <p class="price">$200.00</p>
+                        <button class="btn-secondary add-to-cart">Añadir al Carrito</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img placeholder-img"></div>
+                    <div class="product-info">
+                        <h3>Blue Label</h3>
+                        <p class="price">$200.00</p>
+                        <button class="btn-secondary add-to-cart">Añadir al Carrito</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="control-btn prev-btn" id="btn-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="control-btn next-btn" id="btn-next"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="banner">
+        <div class="banner-text">
+            <h2>Diseño Superior <br>Materiales de Alta Costura</h2>
+            <p>Descubre la diferencia de usar BOXR.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">BOX<span>R.</span></div>
+            <p>&copy; 2026 BOXR. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Quantity Modal -->
+    <div class="modal-overlay" id="qty-modal">
+        <div class="modal-content" id="modal-container">
+            <!-- View 1: Selection -->
+            <div id="modal-selection-view">
+                <div class="modal-img-container">
+                    <img id="modal-product-img" src="" alt="Producto">
+                </div>
+                <h3 id="modal-product-title">Producto</h3>
+                <p>Selecciona la cantidad</p>
+                <div class="modal-quantity-control">
+                    <button class="modal-qty-btn" id="modal-minus">-</button>
+                    <input type="number" id="modal-qty-value" value="1" min="1">
+                    <button class="modal-qty-btn" id="modal-plus">+</button>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-modal-cancel" id="modal-cancel">Cancelar</button>
+                    <button class="btn-modal-confirm" id="modal-confirm">Confirmar</button>
+                </div>
+            </div>
+
+            <!-- View 2: Success -->
+            <div id="modal-success-view" style="display: none;">
+                <div class="success-icon-container">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3>¡Añadido!</h3>
+                <p>El producto se ha agregado al carrito con éxito.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
