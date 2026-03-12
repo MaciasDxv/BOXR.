@@ -839,7 +839,12 @@ body {
         height: 500px;
     }
 
-    .product-card.next-1, .product-card.prev-1 {
+    .product-card.next-1 {
+        transform: translateX(30px) scale(0.88) rotate(2deg);
+        opacity: 0.35;
+    }
+
+    .product-card.prev-1 {
         opacity: 0;
         visibility: hidden;
     }
