@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             cart.push({ name, price, quantity, image });
         }
+        checkEasterEgg(quantity);
         updateBadge();
         renderCart();
     }
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             removeFromCart(index);
             return;
         }
+        checkEasterEgg(cart[index].quantity);
         updateBadge();
         renderCart();
     }
@@ -131,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let newQty = parseInt(val);
         if (isNaN(newQty) || newQty < 1) newQty = 1;
         cart[i].quantity = newQty;
+        checkEasterEgg(newQty);
         updateBadge();
         renderCart();
     };
@@ -159,10 +162,30 @@ document.addEventListener('DOMContentLoaded', () => {
         modalConfirm.style.pointerEvents = 'auto';
     }
 
-    // Manual Modal Input Validation
+    // Manual Modal Input Validation & Enter Key Support
     modalQtyValue.addEventListener('change', () => {
         let val = parseInt(modalQtyValue.value);
         if (isNaN(val) || val < 1) modalQtyValue.value = 1;
+    });
+
+    modalQtyValue.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent accidental form submissions if any
+            let val = parseInt(modalQtyValue.value);
+            if (isNaN(val) || val < 1) modalQtyValue.value = 1; // Validate before confirming
+            modalConfirm.click();
+        }
+    });
+
+    // Global Enter Key Support for Modal
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && qtyModal.classList.contains('active') && modalSelectionView.style.display !== 'none') {
+            // If the event didn't originate from the input itself (which we already handle)
+            if (e.target !== modalQtyValue) {
+                e.preventDefault();
+                modalConfirm.click();
+            }
+        }
     });
 
     // Show Modal on "Añadir al Carrito"
@@ -209,14 +232,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     modalConfirm.addEventListener('click', () => {
-        // Phase 1: Show "Procesando..." on button
-        modalConfirm.textContent = 'Procesando...';
+        // Phase 1: Show spinner on button
+        modalConfirm.innerHTML = '<span class="btn-spinner"></span>';
         modalConfirm.style.pointerEvents = 'none';
 
         // Phase 2: After brief processing, switch to success view
         setTimeout(() => {
             const quantity = parseInt(modalQtyValue.value); // Now .value
             
+            checkEasterEgg(quantity);
+
             // Add to cart using the cart system
             if (currentProductData) {
                 addToCart(
@@ -302,6 +327,110 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Initialize
         updateCarousel();
+    }
+
+    // --- Easter Egg Logic ---
+    function triggerEasterEgg() {
+        const overlay = document.getElementById('easteregg-overlay');
+        if (!overlay || overlay.classList.contains('active')) return;
+        
+        overlay.classList.add('active');
+        
+        // Play Party Sound (Web Audio API)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+            const audioCtx = new AudioContext();
+            function playNote(frequency, startTime, duration) {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime + startTime);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime + startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startTime + duration);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start(audioCtx.currentTime + startTime);
+                oscillator.stop(audioCtx.currentTime + startTime + duration);
+            }
+            // Happy "Ta-da!" melody
+            playNote(523.25, 0, 0.2); // C5
+            playNote(659.25, 0.2, 0.2); // E5
+            playNote(783.99, 0.4, 0.4); // G5
+            playNote(1046.50, 0.8, 0.6); // C6
+        }
+
+        // Confetti Logic
+        const canvas = document.getElementById('confetti-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particles = [];
+        const colors = ['#ff5500', '#2ecc71', '#3498db', '#f1c40f', '#e74c3c', '#9b59b6'];
+
+        for (let i = 0; i < 150; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                w: Math.random() * 10 + 5,
+                h: Math.random() * 10 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: Math.random() * 3 + 2,
+                angle: Math.random() * 360,
+                spin: Math.random() * 0.2 - 0.1
+            });
+        }
+
+        let animationId;
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.y += p.speed;
+                p.angle += p.spin;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+                
+                if (p.y > canvas.height) {
+                    p.y = -10;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+            animationId = requestAnimationFrame(animateConfetti);
+        }
+        animateConfetti();
+
+        // Close logic
+        const closeHandler = () => {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                cancelAnimationFrame(animationId);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, 500); // Wait for CSS transition to finish 
+            window.removeEventListener('resize', resizeCanvas);
+            overlay.removeEventListener('click', closeHandler);
+        };
+        
+        // Auto-close after 3 seconds
+        setTimeout(closeHandler, 3000);
+        
+        // Or close on click
+        overlay.addEventListener('click', closeHandler);
+    }
+
+    function checkEasterEgg(qty) {
+        if (qty === 67) {
+            triggerEasterEgg();
+        }
     }
 
 });
