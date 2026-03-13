@@ -83,12 +83,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateQuantity(index, delta) {
-        cart[index].quantity += delta;
-        if (cart[index].quantity <= 0) {
+        let newQty = cart[index].quantity + delta;
+        if (newQty <= 0) {
             removeFromCart(index);
             return;
         }
-        checkEasterEgg(cart[index].quantity);
+        if (newQty > 50 && newQty !== 67) {
+            newQty = 50; // Cap at 50 in the sidebar
+        }
+        cart[index].quantity = newQty;
+        checkEasterEgg(newQty);
         updateBadge();
         renderCart();
     }
@@ -132,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window._cartInput = (i, val) => {
         let newQty = parseInt(val);
         if (isNaN(newQty) || newQty < 1) newQty = 1;
+        if (newQty > 50 && newQty !== 67) newQty = 50; // Cap at 50 in the sidebar
         cart[i].quantity = newQty;
         checkEasterEgg(newQty);
         updateBadge();
@@ -232,14 +237,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     modalConfirm.addEventListener('click', () => {
+        const quantity = parseInt(modalQtyValue.value);
+
+        if (quantity > 50 && quantity !== 67) {
+            const wholesale = confirm("¿Deseas pedir mayoreo? Contamos con descuentos especiales para compras de más de 50 piezas.");
+            if (wholesale) {
+                qtyModal.classList.remove('active');
+            }
+            return;
+        }
+
         // Phase 1: Show spinner on button
         modalConfirm.innerHTML = '<span class="btn-spinner"></span>';
         modalConfirm.style.pointerEvents = 'none';
 
         // Phase 2: After brief processing, switch to success view
         setTimeout(() => {
-            const quantity = parseInt(modalQtyValue.value); // Now .value
-            
             checkEasterEgg(quantity);
 
             // Add to cart using the cart system
