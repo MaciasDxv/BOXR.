@@ -89,12 +89,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (newQty === 67) {
+            checkEasterEgg(67);
+            renderCart();
+            return;
+        }
+
         let otherItemsTotalQty = cart.reduce((sum, item, i) => sum + (i === index ? 0 : item.quantity), 0);
         let totalProspectiveQty = newQty + otherItemsTotalQty;
 
-        if (totalProspectiveQty > 25 && newQty !== 67) {
-            newQty = 25 - otherItemsTotalQty; // Cap so the total cart is 25
-            if(newQty < 1) newQty = 1;
+        if (totalProspectiveQty > 25) {
+            wasModalActive = false;
+            wholesaleModal.classList.add('active'); // Show alert instead of silent cap
+            return;
         }
         
         cart[index].quantity = newQty;
@@ -144,12 +151,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let newQty = parseInt(val);
         if (isNaN(newQty) || newQty < 1) newQty = 1;
 
+        if (newQty === 67) {
+            checkEasterEgg(67);
+            renderCart();
+            return;
+        }
+
         let otherItemsTotalQty = cart.reduce((sum, item, idx) => sum + (idx === i ? 0 : item.quantity), 0);
         let totalProspectiveQty = newQty + otherItemsTotalQty;
 
-        if (totalProspectiveQty > 25 && newQty !== 67) {
-            newQty = 25 - otherItemsTotalQty; // Cap so the total cart is 25
-            if(newQty < 1) newQty = 1;
+        if (totalProspectiveQty > 25) {
+            wasModalActive = false;
+            wholesaleModal.classList.add('active'); // Show alert instead of silent cap
+            renderCart(); // Reset input value to current quantity
+            return;
         }
 
         cart[i].quantity = newQty;
@@ -178,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentBtn = null;
     let currentProductData = null;
+    let wasModalActive = false; // Flag to track wholesale trigger source
 
     // Reset Modal View Helper
     function resetModal() {
@@ -259,11 +275,20 @@ document.addEventListener('DOMContentLoaded', () => {
     modalConfirm.addEventListener('click', () => {
         const quantity = parseInt(modalQtyValue.value);
         
+        // Easter Egg (67 pieces): Only animation, NO add to cart
+        if (quantity === 67) {
+            checkEasterEgg(67);
+            qtyModal.classList.remove('active');
+            setTimeout(resetModal, 500);
+            return;
+        }
+
         // Calculate prospective total quantity including ALL items in the cart
         const currentTotalQtyInCart = cart.reduce((sum, item) => sum + item.quantity, 0);
         const totalProspectiveQty = quantity + currentTotalQtyInCart;
 
-        if (totalProspectiveQty > 25 && quantity !== 67) {
+        if (totalProspectiveQty > 25) {
+            wasModalActive = true;
             qtyModal.classList.remove('active'); // Hide previous modal
             wholesaleModal.classList.add('active');
             return;
@@ -273,11 +298,11 @@ document.addEventListener('DOMContentLoaded', () => {
         modalConfirm.innerHTML = '<span class="btn-spinner"></span>';
         modalConfirm.style.pointerEvents = 'none';
 
-        // Phase 2: After brief processing, switch to success view
+        // Phase 2: Switch to success view
         setTimeout(() => {
             checkEasterEgg(quantity);
 
-            // Add to cart using the cart system
+            // Add to cart
             if (currentProductData) {
                 addToCart(
                     currentProductData.name,
@@ -306,6 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         currentBtn.textContent = originalText;
                     }, 2000);
                 }
+                
+                setTimeout(resetModal, 500); // Reset for next time
             }, 1500);
         }, 800);
     });
@@ -320,7 +347,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Wholesale Modal Controls
     wholesaleCancel.addEventListener('click', () => {
         wholesaleModal.classList.remove('active'); 
-        qtyModal.classList.add('active'); // Show previous modal again so they can modify
+        if (wasModalActive) {
+            resetModal();
+            qtyModal.classList.add('active'); // Show previous modal again so they can modify
+        }
     });
 
     wholesaleConfirm.addEventListener('click', () => {

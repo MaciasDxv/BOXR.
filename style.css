@@ -179,7 +179,6 @@ body {
     padding: 1rem;
     border-bottom: 1px solid #222;
     align-items: center;
-    animation: fadeInScale 0.3s ease;
 }
 
 .cart-item-img {
@@ -698,7 +697,7 @@ body {
 #modal-qty-value {
     font-size: 2rem;
     font-weight: 900;
-    width: 70px;
+    width: 90px;
     border: none;
     background: none;
     text-align: center;
