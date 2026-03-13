@@ -88,9 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
             removeFromCart(index);
             return;
         }
-        if (newQty > 50 && newQty !== 67) {
-            newQty = 50; // Cap at 50 in the sidebar
+
+        let otherItemsTotalQty = cart.reduce((sum, item, i) => sum + (i === index ? 0 : item.quantity), 0);
+        let totalProspectiveQty = newQty + otherItemsTotalQty;
+
+        if (totalProspectiveQty > 25 && newQty !== 67) {
+            newQty = 25 - otherItemsTotalQty; // Cap so the total cart is 25
+            if(newQty < 1) newQty = 1;
         }
+        
         cart[index].quantity = newQty;
         checkEasterEgg(newQty);
         updateBadge();
@@ -110,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img class="cart-item-img" src="${item.image}" alt="${item.name}">
                 <div class="cart-item-details">
                     <div class="cart-item-name">${item.name}</div>
-                    <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                    <div class="cart-item-price">$${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
                 <div class="cart-item-controls">
                     <button class="cart-item-qty-btn" onclick="window._cartMinus(${i})">-</button>
@@ -125,8 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update totals
         const total = getCartTotal();
-        cartSubtotalEl.textContent = `$${total.toFixed(2)}`;
-        cartTotalEl.textContent = `$${total.toFixed(2)}`;
+        const formattedTotal = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        cartSubtotalEl.textContent = `$${formattedTotal}`;
+        cartTotalEl.textContent = `$${formattedTotal}`;
     }
 
     // Expose cart functions globally for inline onclick handlers
@@ -136,7 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window._cartInput = (i, val) => {
         let newQty = parseInt(val);
         if (isNaN(newQty) || newQty < 1) newQty = 1;
-        if (newQty > 50 && newQty !== 67) newQty = 50; // Cap at 50 in the sidebar
+
+        let otherItemsTotalQty = cart.reduce((sum, item, idx) => sum + (idx === i ? 0 : item.quantity), 0);
+        let totalProspectiveQty = newQty + otherItemsTotalQty;
+
+        if (totalProspectiveQty > 25 && newQty !== 67) {
+            newQty = 25 - otherItemsTotalQty; // Cap so the total cart is 25
+            if(newQty < 1) newQty = 1;
+        }
+
         cart[i].quantity = newQty;
         checkEasterEgg(newQty);
         updateBadge();
@@ -156,6 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalConfirm = document.getElementById('modal-confirm');
     const modalCancel = document.getElementById('modal-cancel');
     
+    // Wholesale Modal
+    const wholesaleModal = document.getElementById('wholesale-modal');
+    const wholesaleConfirm = document.getElementById('wholesale-confirm');
+    const wholesaleCancel = document.getElementById('wholesale-cancel');
+
     let currentBtn = null;
     let currentProductData = null;
 
@@ -238,12 +258,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalConfirm.addEventListener('click', () => {
         const quantity = parseInt(modalQtyValue.value);
+        
+        // Calculate prospective total quantity including ALL items in the cart
+        const currentTotalQtyInCart = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const totalProspectiveQty = quantity + currentTotalQtyInCart;
 
-        if (quantity > 50 && quantity !== 67) {
-            const wholesale = confirm("¿Deseas pedir mayoreo? Contamos con descuentos especiales para compras de más de 50 piezas.");
-            if (wholesale) {
-                qtyModal.classList.remove('active');
-            }
+        if (totalProspectiveQty > 25 && quantity !== 67) {
+            qtyModal.classList.remove('active'); // Hide previous modal
+            wholesaleModal.classList.add('active');
             return;
         }
 
@@ -292,6 +314,24 @@ document.addEventListener('DOMContentLoaded', () => {
     qtyModal.addEventListener('click', (e) => {
         if (e.target === qtyModal) {
             qtyModal.classList.remove('active');
+        }
+    });
+
+    // Wholesale Modal Controls
+    wholesaleCancel.addEventListener('click', () => {
+        wholesaleModal.classList.remove('active'); 
+        qtyModal.classList.add('active'); // Show previous modal again so they can modify
+    });
+
+    wholesaleConfirm.addEventListener('click', () => {
+        wholesaleModal.classList.remove('active');
+        qtyModal.classList.remove('active'); // Close everything to return to home page
+    });
+
+    // Close wholesale modal on overlay click
+    wholesaleModal.addEventListener('click', (e) => {
+        if (e.target === wholesaleModal) {
+            wholesaleModal.classList.remove('active');
         }
     });
 

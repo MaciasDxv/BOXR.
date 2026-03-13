@@ -1044,6 +1044,27 @@ footer p {
     to { transform: rotate(360deg); }
 }
 
+/* ====== WHOLESALE MODAL ====== */
+.text-center {
+    text-align: center;
+}
+
+.wholesale-icon {
+    font-size: 4rem;
+    color: #000;
+    margin-bottom: 1rem;
+}
+
+#wholesale-modal .modal-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#wholesale-modal .modal-content p {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
 
 
 
